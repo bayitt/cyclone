@@ -3,9 +3,9 @@ from typing import Annotated
 from sqlalchemy.orm import Session
 
 from ..dependencies.database import get_db
-from ..dependencies.application import create_application_pipe
+from ..dependencies.application import create_application_pipe, update_application_pipe
 from ..database.models import Application as ApplicationModel, Credentials
-from ..schemas.application import Application, ApplicationCreate
+from ..schemas.application import Application, ApplicationCreate, ApplicationUpdate
 from ..utilities.key import generate_api_key
 
 router = APIRouter()
@@ -30,3 +30,13 @@ def create_application(
     db.commit()
 
     return application
+
+
+@router.put("/{application_uuid}")
+def update_application(
+    body: ApplicationUpdate,
+    application: ApplicationModel = Depends(update_application_pipe),
+    db: Session = Depends(get_db),
+):
+    body_dict = body.dict()
+    print("")
