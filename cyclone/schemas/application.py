@@ -1,13 +1,13 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, constr
 from typing import Any
 
 from .base import CycloneBaseModel
-from .credentials import CredentialsType, Credentials
+from .credentials import  Credentials
 
 
 class ApplicationCreate(BaseModel):
-    name: str = Field(description="Name of the application")
-    credentials_type: CredentialsType = Field(
+    name: constr(to_lower=True) = Field(description="Name of the application")
+    credentials_type: constr(to_lower=True) = Field(
         description="The supported mail provider for the application"
     )
     credentials_values: dict[str, Any] = Field(
@@ -16,8 +16,8 @@ class ApplicationCreate(BaseModel):
 
 
 class ApplicationUpdate(BaseModel):
-    name: str | None = Field(description="Name of the application")
-    credentials_type: CredentialsType | None = Field(
+    name: constr(to_lower=True) | None = Field(description="Name of the application")
+    credentials_type: constr(to_lower=True) = Field(
         description="The supported mail provider for the application"
     )
     credentials_values: dict[str, Any] | None = Field(
