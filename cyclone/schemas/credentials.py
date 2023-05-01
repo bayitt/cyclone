@@ -1,5 +1,4 @@
-from pydantic import Field, constr
-from enum import Enum
+from pydantic import Field
 from typing import Any
 
 from .base import CycloneBaseModel

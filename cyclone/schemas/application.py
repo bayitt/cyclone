@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, constr
+from pydantic import BaseModel, Field
 from typing import Any
 
 from .base import CycloneBaseModel
@@ -6,13 +6,11 @@ from .credentials import Credentials
 
 
 class ApplicationCreate(BaseModel):
-    name: constr(to_lower=True) = Field(
-        description="Name of the application", example="maui"
-    )
-    credentials_type: constr(to_lower=True) = Field(
+    name: str = Field(description="Name of the application", example="maui")
+    credentials_type: str = Field(
         description="The supported mail provider for the application", example="mailgun"
     )
-    credentials_values: dict[str, Any] = Field(
+    credentials_values: dict[str, Any] | None = Field(
         default=None,
         description="Relevant configuration values for the mail provider",
         example={
@@ -23,8 +21,8 @@ class ApplicationCreate(BaseModel):
 
 
 class ApplicationUpdate(BaseModel):
-    name: constr(to_lower=True) | None = Field(description="Name of the application")
-    credentials_type: constr(to_lower=True) = Field(
+    name: str | None = Field(description="Name of the application")
+    credentials_type: str | None = Field(
         description="The supported mail provider for the application", example="mailgun"
     )
     credentials_values: dict[str, Any] | None = Field(
