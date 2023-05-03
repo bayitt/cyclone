@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from uuid import UUID
 
 from .database import get_db
 from ..schemas.application import ApplicationCreate, ApplicationUpdate
@@ -19,7 +20,7 @@ def create_application_pipe(body: ApplicationCreate, db: Session = Depends(get_d
 
 
 def update_application_pipe(
-    application_uuid: str, body: ApplicationUpdate, db: Session = Depends(get_db)
+    application_uuid: UUID, body: ApplicationUpdate, db: Session = Depends(get_db)
 ):
     application = (
         db.query(Application).filter(Application.uuid == application_uuid).first()

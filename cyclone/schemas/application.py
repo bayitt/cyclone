@@ -21,11 +21,14 @@ class ApplicationCreate(BaseModel):
 
 
 class ApplicationUpdate(BaseModel):
-    name: str | None = Field(description="Name of the application")
+    name: str | None = Field(default=None, description="Name of the application")
     credentials_type: str | None = Field(
-        description="The supported mail provider for the application", example="mailgun"
+        default=None,
+        description="The supported mail provider for the application",
+        example="mailgun",
     )
     credentials_values: dict[str, Any] | None = Field(
+        default=None,
         description="Relevant configuration values for the mail provider",
         example={
             "client_id": "xsf-440dkdd-djdj",
@@ -33,7 +36,8 @@ class ApplicationUpdate(BaseModel):
         },
     )
     layout: str | None = Field(
-        description="Layout/framework for mail templates used by the application"
+        default=None,
+        description="Layout/framework for mail templates used by the application",
     )
 
 

@@ -37,6 +37,22 @@ def update_application(
     body: ApplicationUpdate,
     application: ApplicationModel = Depends(update_application_pipe),
     db: Session = Depends(get_db),
-):
-    body_dict = body.dict()
-    print("")
+) -> Application:
+    body_dict = body.dict(exclude_unset=True)
+    credentials = application.credentials
+
+    for key, value in body_dict.items():
+        if key == "credentials_type" or key == "credentials_values":
+            setattr(
+                credentials,
+                key,
+                value
+                if key == "credentials_values"
+                else (1 if value.lower() == "mailgun" else 2),
+            )
+            return
+
+        setattr(application, key, value)
+
+    db.commit()
+    return application
