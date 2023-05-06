@@ -2,12 +2,12 @@ from pydantic import BaseModel, Field
 from typing import Any
 
 from .base import CycloneBaseModel
-from .credentials import Credentials
+from .credentials import CredentialsType, Credentials
 
 
 class ApplicationCreate(BaseModel):
     name: str = Field(description="Name of the application", example="maui")
-    credentials_type: str = Field(
+    credentials_type: CredentialsType = Field(
         description="The supported mail provider for the application", example="mailgun"
     )
     credentials_values: dict[str, Any] | None = Field(
@@ -22,7 +22,7 @@ class ApplicationCreate(BaseModel):
 
 class ApplicationUpdate(BaseModel):
     name: str | None = Field(default=None, description="Name of the application")
-    credentials_type: str | None = Field(
+    credentials_type: CredentialsType | None = Field(
         default=None,
         description="The supported mail provider for the application",
         example="mailgun",

@@ -23,7 +23,7 @@ def create_application(
 
     application_credentials = Credentials(
         application_uuid=application.uuid,
-        type=1 if body.credentials_type.lower() == "mailgun" else 2,
+        type=body.credentials_type.value,
         values=body.credentials_values,
     )
     db.add(application_credentials)
@@ -48,7 +48,7 @@ def update_application(
                 key,
                 value
                 if key == "credentials_values"
-                else (1 if value.lower() == "mailgun" else 2),
+                else value.value
             )
             return
 
