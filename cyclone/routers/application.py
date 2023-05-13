@@ -39,19 +39,8 @@ def update_application(
     db: Session = Depends(get_db),
 ) -> Application:
     body_dict = body.dict(exclude_unset=True)
-    credentials = application.credentials
 
     for key, value in body_dict.items():
-        if key == "credentials_type" or key == "credentials_values":
-            setattr(
-                credentials,
-                key,
-                value
-                if key == "credentials_values"
-                else value.value
-            )
-            return
-
         setattr(application, key, value)
 
     db.commit()

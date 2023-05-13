@@ -18,6 +18,11 @@ def create_application_pipe(body: ApplicationCreate, db: Session = Depends(get_d
             detail=f"Application with name {body.name} exists already",
         )
 
+    # if body.credentials_type == 1:
+    #     mailgun_keys = ["domain", "secret", "from_name", "from_address"]
+
+    #     for 
+
 
 def update_application_pipe(
     application_uuid: UUID, body: ApplicationUpdate, db: Session = Depends(get_db)
