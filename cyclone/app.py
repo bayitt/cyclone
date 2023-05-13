@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, Request, Response
 
 from .utilities.env import load_env
 from .middleware.session import add_session_middleware
-from .routers import auth, application
+from .routers import auth, application, credentials
 from .dependencies.auth import auth_guard
 from .database.setup import SessionLocal
 
@@ -29,4 +29,7 @@ add_session_middleware(app)
 app.include_router(auth.router)
 app.include_router(
     application.router, prefix="/applications", dependencies=[Depends(auth_guard)]
+)
+app.include_router(
+    credentials.router, prefix="/credentials", dependencies=[Depends(auth_guard)]
 )
