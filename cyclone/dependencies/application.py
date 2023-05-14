@@ -33,9 +33,7 @@ def create_application_pipe(body: ApplicationCreate, db: Session = Depends(get_d
             )
 
 
-def update_application_pipe(
-    application_uuid: UUID, body: ApplicationUpdate, db: Session = Depends(get_db)
-):
+def application_by_uuid_pipe(application_uuid: UUID, db: Session = Depends(get_db)):
     application = (
         db.query(Application).filter(Application.uuid == application_uuid).first()
     )
@@ -46,6 +44,14 @@ def update_application_pipe(
             detail=f"Application with uuid {application_uuid} does not exist",
         )
 
+    return application
+
+
+def update_application_pipe(
+    body: ApplicationUpdate,
+    application: Application = Depends(application_by_uuid_pipe),
+    db: Session = Depends(get_db),
+):
     if body.name:
         named_application = (
             db.query(Application).filter(Application.name == body.name.lower()).first()
