@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Depends, status
 from typing import Annotated
 from sqlalchemy.orm import Session
 
@@ -11,7 +11,11 @@ from ..utilities.key import generate_api_key
 router = APIRouter()
 
 
-@router.post("", dependencies=[Depends(create_application_pipe)])
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(create_application_pipe)],
+)
 def create_application(
     body: ApplicationCreate,
     db: Annotated[Session, Depends(get_db)],
