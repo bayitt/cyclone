@@ -21,11 +21,11 @@ class Application(Base):
     credentials = relationship(
         "Credentials",
         back_populates="application",
-        cascade="all, delete-orphan",
         uselist=False,
     )
     emails = relationship(
-        "Email", back_populates="application", cascade="all, delete-orphan"
+        "Email",
+        back_populates="application",
     )
 
 
@@ -35,13 +35,17 @@ class Credentials(Base):
     uuid: uuid_pkg.UUID = Column(
         Uuid, default=uuid_pkg.uuid4, primary_key=True, index=True
     )
-    application_uuid: uuid_pkg.UUID = Column(Uuid, ForeignKey("applications.uuid"))
+    application_uuid: uuid_pkg.UUID = Column(
+        Uuid, ForeignKey("applications.uuid", ondelete="CASCADE")
+    )
     type: int = Column(Integer)
     values: dict[str, str] | None = Column(JSON, nullable=True)
     created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
 
-    application = relationship("Application", back_populates="credentials")
+    application = relationship(
+        "Application", back_populates="credentials", passive_deletes=True
+    )
 
 
 class Email(Base):
@@ -50,11 +54,15 @@ class Email(Base):
     uuid: uuid_pkg.UUID = Column(
         Uuid, default=uuid_pkg.uuid4, primary_key=True, index=True
     )
-    application_uuid: uuid_pkg.UUID = Column(Uuid, ForeignKey("applications.uuid"))
+    application_uuid: uuid_pkg.UUID = Column(
+        Uuid, ForeignKey("applications.uuid", ondelete="CASCADE")
+    )
     name: str = Column(String, index=True)
     template: str = Column(String)
     variables: list[str] | None = Column(JSON, nullable=True)
     created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
 
-    application = relationship("Application", back_populates="emails")
+    application = relationship(
+        "Application", back_populates="emails", passive_deletes=True
+    )
