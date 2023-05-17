@@ -2,6 +2,7 @@ from sqlalchemy import Column, ForeignKey, String, DateTime, Uuid, Integer, JSON
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid as uuid_pkg
+from typing import Any
 
 from .setup import Base
 
@@ -66,3 +67,26 @@ class Email(Base):
     application = relationship(
         "Application", back_populates="emails", passive_deletes=True
     )
+
+
+class Dispatch(Base):
+    __tablename__ = "Dispatches"
+
+    uuid: uuid_pkg.UUID = Column(
+        Uuid, default=uuid_pkg.uuid4, primary_key=True, index=True
+    )
+    application_uuid: uuid_pkg.UUID = Column(
+        Uuid, ForeignKey("emails.uuid", ondelete="CASCADE")
+    )
+    email_uuid: uuid_pkg.UUID = Column(
+        Uuid, ForeignKey("emails.uuid", ondelete="CASCADE"), nullable=True
+    )
+    template: str = Column(String)
+    variables: dict[str, Any] | None = Column(JSON, nullable=True)
+    created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    application = relationship(
+        "Application", back_populates="applications", passive_deletes=True
+    )
+    email = relationship("Email", back_populates="emails", passive_deletes=True)
