@@ -28,7 +28,7 @@ async def db_session_middleware(request: Request, call_next):
 add_session_middleware(app)
 
 app.include_router(auth.router)
-app.include_router(dispatch.router, dependencies=[Depends(dispatch_guard)])
+app.include_router(dispatch.router)
 app.include_router(
     credentials.router,
     prefix="/applications/{application_uuid}/credentials",

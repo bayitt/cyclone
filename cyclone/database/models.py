@@ -70,7 +70,7 @@ class Email(Base):
 
 
 class Dispatch(Base):
-    __tablename__ = "Dispatches"
+    __tablename__ = "dispatches"
 
     uuid: uuid_pkg.UUID = Column(
         Uuid, default=uuid_pkg.uuid4, primary_key=True, index=True
@@ -83,6 +83,7 @@ class Dispatch(Base):
     )
     template: str = Column(String)
     variables: dict[str, Any] | None = Column(JSON, nullable=True)
+    logs: str | None = Column(String, nullable=True)
     created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
 
