@@ -24,7 +24,10 @@ def dispatch_guard(
     application = db.query(Application).filter(Application.api_key == api_key).first()
 
     if not application:
-        raise auth_exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Application with api key {api_key} does not exist",
+        )
 
     email = (
         db.query(Email)
@@ -34,4 +37,26 @@ def dispatch_guard(
         .first()
     )
 
-    return email
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Email {body.name.upper()} does not exist",
+        )
+
+    if not email.variables:
+        return email
+
+    request_variables = body.variables or dict()
+    missing_variables = list()
+
+    for variable in email.variables:
+        if not request_variables.get(variable):
+            missing_variables.append(variable)
+
+    if len(missing_variables) > 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"The following variables are missing - {', '.join(missing_variables)} ",
+        )
+
+    return (email, application)
