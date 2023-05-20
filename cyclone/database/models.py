@@ -28,6 +28,7 @@ class Application(Base):
         "Email",
         back_populates="application",
     )
+    dispatches = relationship("Dispatch", back_populates="application")
 
 
 class Credentials(Base):
@@ -67,6 +68,7 @@ class Email(Base):
     application = relationship(
         "Application", back_populates="emails", passive_deletes=True
     )
+    dispatches = relationship("Dispatch", back_populates="email")
 
 
 class Dispatch(Base):
@@ -76,7 +78,7 @@ class Dispatch(Base):
         Uuid, default=uuid_pkg.uuid4, primary_key=True, index=True
     )
     application_uuid: uuid_pkg.UUID = Column(
-        Uuid, ForeignKey("emails.uuid", ondelete="CASCADE")
+        Uuid, ForeignKey("applications.uuid", ondelete="CASCADE")
     )
     email_uuid: uuid_pkg.UUID = Column(
         Uuid, ForeignKey("emails.uuid", ondelete="CASCADE"), nullable=True
@@ -88,6 +90,6 @@ class Dispatch(Base):
     updated_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
 
     application = relationship(
-        "Application", back_populates="applications", passive_deletes=True
+        "Application", back_populates="dispatches", passive_deletes=True
     )
-    email = relationship("Email", back_populates="emails", passive_deletes=True)
+    email = relationship("Email", back_populates="dispatches")

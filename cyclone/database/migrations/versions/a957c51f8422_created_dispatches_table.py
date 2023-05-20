@@ -1,8 +1,8 @@
 """created dispatches table
 
-Revision ID: aee610e71c9b
+Revision ID: a957c51f8422
 Revises: feef1b627a1c
-Create Date: 2023-05-20 13:50:32.888701
+Create Date: 2023-05-20 21:11:38.589252
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "aee610e71c9b"
+revision = "a957c51f8422"
 down_revision = "feef1b627a1c"
 branch_labels = None
 depends_on = None
@@ -29,7 +29,7 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True),
         sa.ForeignKeyConstraint(
-            ["application_uuid"], ["emails.uuid"], ondelete="CASCADE"
+            ["application_uuid"], ["applications.uuid"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(["email_uuid"], ["emails.uuid"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("uuid"),

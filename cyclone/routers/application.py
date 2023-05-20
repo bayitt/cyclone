@@ -44,6 +44,10 @@ def update_application(
 ) -> Application:
     body_dict = body.dict(exclude_unset=True)
 
+    if body_dict.get("layout"):
+        body_dict["layout"] = body.layout.replace("+#<", "{{")
+        body_dict["layout"] = body_dict["layout"].replace("+#>", "}}")
+
     for key, value in body_dict.items():
         setattr(application, key, value)
 

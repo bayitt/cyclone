@@ -19,6 +19,8 @@ def create_email(
 ) -> Email:
     body_dict = body.dict(exclude_unset=True)
     body_dict["name"] = body.name.upper()
+    body_dict["template"] = body.template.replace("+#<", "{{")
+    body_dict["template"] = body_dict["template"].replace("+#>", "}}")
     email = EmailModel(application_uuid=application_uuid, **body_dict)
     db.add(email)
     db.commit()
@@ -37,6 +39,10 @@ def update_email(
 
     if body_dict.get("name"):
         body_dict["name"] = body_dict["name"].upper()
+
+    if body_dict.get("template"):
+        body_dict["template"] = body.template.replace("+#<", "{{")
+        body_dict["template"] = body_dict["template"].replace("+#>", "}}")
 
     for key, value in body_dict.items():
         setattr(email, key, value)

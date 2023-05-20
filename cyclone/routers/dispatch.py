@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from jinja2 import Template
+from markupsafe import Markup
 
 from ..database.models import Application, Email, Dispatch
 from ..schemas.dispatch import DispatchCreate
@@ -27,6 +28,6 @@ def send(
     verify_template_layout(application)
 
     template = env.get_template(f"{application.name.lower()}.html")
-    html = template.render(template=Template(email.template).render(**body.variables))
-
-    print(html)
+    html = template.render(
+        template=Markup(Template(email.template).render(**body.variables))
+    )

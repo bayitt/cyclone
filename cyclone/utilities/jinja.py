@@ -6,7 +6,7 @@ from ..database.models import Application
 
 
 def verify_template_directory():
-    directory = Path(path.join(path.abspath(__file__), "..", "templates"))
+    directory = Path(path.join(path.abspath(__file__), "..", "..", "templates"))
 
     if not directory.is_dir():
         makedirs(directory)
@@ -19,6 +19,7 @@ def verify_template_layout(application: Application):
     layout_file = Path(
         path.join(
             path.abspath(__file__),
+            "..",
             "..",
             "templates",
             f"{application.name.lower()}.html",

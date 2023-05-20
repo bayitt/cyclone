@@ -12,12 +12,11 @@ def dispatch_guard(
     authorization: Annotated[str | None, Header()] = None,
     db: Session = Depends(get_db),
 ):
-    auth_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED, detail="You are not authenticated"
-    )
-
     if not authorization or len(authorization.split(" ")) != 2:
-        raise auth_exception
+        HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Api key is missing",
+        )
 
     api_key = authorization.split(" ")[1]
 
@@ -25,7 +24,7 @@ def dispatch_guard(
 
     if not application:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Application with api key {api_key} does not exist",
         )
 
@@ -40,7 +39,7 @@ def dispatch_guard(
     if not email:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Email {body.name.upper()} does not exist",
+            detail=f"Email with name {body.email.upper()} does not exist",
         )
 
     if not email.variables:
