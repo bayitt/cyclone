@@ -60,6 +60,7 @@ class Email(Base):
         Uuid, ForeignKey("applications.uuid", ondelete="CASCADE")
     )
     name: str = Column(String, index=True)
+    subject: str = Column(String)
     template: str = Column(String)
     variables: list[str] | None = Column(JSON, nullable=True)
     created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
