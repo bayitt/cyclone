@@ -5,7 +5,9 @@ from .base import CycloneBaseModel
 
 class EmailCreate(BaseModel):
     name: str = Field(description="Name of the email", example="VERIFY_USER")
-    subject: str = Field(description="Subject of the email", example="Verify Your Email")
+    subject: str = Field(
+        description="Subject of the email", example="Verify Your Email"
+    )
     template: str = Field(description="Specific template for the email")
     variables: list[str] | None = Field(
         default=None,
@@ -18,7 +20,9 @@ class EmailUpdate(BaseModel):
     name: str | None = Field(
         default=None, description="Name of the email", example="VERIFY_USER"
     )
-    subject: str | None = Field(default=None, description="Subject of the email", example="Verify Your Email")
+    subject: str | None = Field(
+        default=None, description="Subject of the email", example="Verify Your Email"
+    )
     template: str | None = Field(
         default=None, description="Specific template for the email"
     )
@@ -31,7 +35,9 @@ class EmailUpdate(BaseModel):
 
 class Email(CycloneBaseModel):
     name: str = Field(description="Name of the email", example="VERIFY_USER")
-    subject: str = Field(description="Subject of the email", example="Verify Your Email")
+    subject: str = Field(
+        description="Subject of the email", example="Verify Your Email"
+    )
     template: str = Field(description="Specific template for the email")
     variables: list[str] | None = Field(
         default=None,
