@@ -19,6 +19,13 @@ class DispatchCreate(BaseModel):
     )
 
 
+class DispatchEmail(BaseModel):
+    name: str = Field(description="Name of the email", example="VERIFY_USER")
+
+    class Config:
+        orm_mode = True
+
+
 class Dispatch(CycloneBaseModel):
     template: str = Field(
         description="Email template sent to the recipients", example=""
@@ -32,3 +39,15 @@ class Dispatch(CycloneBaseModel):
         default=None,
         description="Recorded logs for the dispatch containing information about the dispatch failing",
     )
+    email: DispatchEmail = Field(description="Associated email model for the dispatch")
+
+
+class PaginatedDispatches(BaseModel):
+    currentPage: int = Field(
+        description="Current page of dispatches being returned", example=1
+    )
+    maxPages: int = Field(
+        description="Maximum number of paginated pages based on the passed in page query parameter",
+        example=10,
+    )
+    dispatches: list[Dispatch] = Field(description="Dispatches being returned")
