@@ -1,71 +1,41 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from jinja2 import Template
-from markupsafe import Markup
-import sys
+from sqlalchemy import func
+from typing import Annotated
+from uuid import UUID
+from math import ceil
 
-from ..database.models import Application, Email, Credentials, Dispatch
-from ..schemas.dispatch import DispatchCreate
+from ..dependencies.application import application_by_uuid_pipe
 from ..dependencies.database import get_db
-from ..dependencies.dispatch import dispatch_guard
-from ..utilities.jinja import (
-    verify_template_directory,
-    verify_template_layout,
-    get_jinja_env_object,
-)
-from ..utilities.mail import send_mailgun_mail
+from ..database.models import Dispatch
+from ..schemas.dispatch import PaginatedDispatches
 
 router = APIRouter()
 
 
-@router.post("/send", status_code=status.HTTP_200_OK)
-def send(
-    body: DispatchCreate,
-    response: Response,
-    dispatch_dependency: tuple[Email, Application] = Depends(dispatch_guard),
+@router.get("/", dependencies=[Depends(application_by_uuid_pipe)])
+def get_dispatches(
+    application_uuid: UUID,
     db: Session = Depends(get_db),
-):
-    verify_template_directory()
-    env = get_jinja_env_object()
-    email, application = dispatch_dependency
-    verify_template_layout(application)
-
-    template = env.get_template(f"{application.name.lower()}.html")
-    html = template.render(
-        template=Markup(Template(email.template).render(**body.variables))
+    page: Annotated[
+        int, Query(description="Paginated page of results to fetch", example=1)
+    ] = 1,
+    number: Annotated[
+        int, Query(description="Number of dispatches to fetch", example=10)
+    ] = 10,
+) -> PaginatedDispatches:
+    skip = (page - 1) * number
+    dispatches = (
+        db.query(Dispatch)
+        .filter(Dispatch.application_uuid == application_uuid)
+        .offset(skip)
+        .limit(number)
+        .all()
     )
 
-    dispatch_data = {
-        "application_uuid": application.uuid,
-        "email_uuid": email.uuid,
-        "template": html,
-        "variables": body.variables,
-    }
-    credentials: Credentials = application.credentials
-    logs = None
+    totalDispatches = db.query(
+        func.count(Dispatch.application_uuid == application_uuid)
+    ).scalar()
+    maxPages = ceil(totalDispatches / number)
 
-    try:
-        match credentials.type:
-            case 1:
-                send_mailgun_mail(
-                    body.recipients, email.subject, html, credentials.values
-                )
-            case _:
-                send_mailgun_mail(
-                    body.recipients, email.subject, html, credentials.values
-                )
-    except Exception:
-        exception = sys.exc_info()
-        logs = exception[1]
-        dispatch_data["logs"] = str(logs)
-        response.status_code = status.HTTP_502_BAD_GATEWAY
-
-    dispatch = Dispatch(**dispatch_data)
-    db.add(dispatch)
-    db.commit()
-
-    return {
-        "message": "The email request failed"
-        if logs
-        else "The email was sent successfully"
-    }
+    return {"currentPage": page, "maxPages": maxPages, "dispatches": dispatches}

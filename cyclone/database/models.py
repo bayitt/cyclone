@@ -1,10 +1,12 @@
 from sqlalchemy import Column, ForeignKey, String, DateTime, Uuid, Integer, JSON
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.hybrid import hybrid_property
 from datetime import datetime
 import uuid as uuid_pkg
 from typing import Any
 
 from .setup import Base
+from ..utilities.jinja import parse_incoming_template, parse_outgoing_template
 
 
 class Application(Base):
@@ -15,9 +17,22 @@ class Application(Base):
     )
     name: str = Column(String, index=True)
     api_key: str | None = Column(String, nullable=True)
-    layout: str | None = Column(String, nullable=True)
+    _layout: str | None = Column(String, nullable=True)
     created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
-    updated_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at: datetime = Column(
+        DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    @hybrid_property
+    def layout(self):
+        if not self._layout:
+            return None
+
+        return parse_outgoing_template(self._layout)
+
+    @layout.setter
+    def layout(self, layout: str | None):
+        self._layout = None if not layout else parse_incoming_template(layout)
 
     credentials = relationship(
         "Credentials",
@@ -43,7 +58,9 @@ class Credentials(Base):
     type: int = Column(Integer)
     values: dict[str, str] | None = Column(JSON, nullable=True)
     created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
-    updated_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at: datetime = Column(
+        DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     application = relationship(
         "Application", back_populates="credentials", passive_deletes=True
@@ -61,10 +78,20 @@ class Email(Base):
     )
     name: str = Column(String, index=True)
     subject: str = Column(String)
-    template: str = Column(String)
+    _template: str = Column(String)
     variables: list[str] | None = Column(JSON, nullable=True)
     created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
-    updated_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at: datetime = Column(
+        DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    @hybrid_property
+    def template(self):
+        return parse_outgoing_template(self._template)
+
+    @template.setter
+    def template(self, template: str):
+        self._template = parse_incoming_template(template)
 
     application = relationship(
         "Application", back_populates="emails", passive_deletes=True
@@ -88,7 +115,9 @@ class Dispatch(Base):
     variables: dict[str, Any] | None = Column(JSON, nullable=True)
     logs: str | None = Column(String, nullable=True)
     created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
-    updated_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at: datetime = Column(
+        DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     application = relationship(
         "Application", back_populates="dispatches", passive_deletes=True
