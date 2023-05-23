@@ -4,7 +4,7 @@ from .base import CycloneBaseModel
 
 
 class EmailCreate(BaseModel):
-    name: str = Field(description="Name of the email", example="VERIFY_USER")
+    name: str = Field(description="Name of the email", example="VERIFY_USER", to_upper=True)
     subject: str = Field(
         description="Subject of the email", example="Verify Your Email"
     )

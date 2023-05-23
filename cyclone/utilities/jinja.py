@@ -1,9 +1,7 @@
 from pathlib import Path
 from os import path, makedirs
 from jinja2 import Environment, PackageLoader, select_autoescape
-
-from ..database.models import Application
-
+import importlib
 
 def verify_template_directory():
     directory = Path(path.join(path.abspath(__file__), "..", "..", "templates"))
@@ -12,7 +10,7 @@ def verify_template_directory():
         makedirs(directory)
 
 
-def verify_template_layout(application: Application):
+def verify_template_layout(application):
     if not application.layout:
         return
 
@@ -34,3 +32,10 @@ def verify_template_layout(application: Application):
 
 def get_jinja_env_object():
     return Environment(loader=PackageLoader("cyclone"), autoescape=select_autoescape())
+
+
+def parse_incoming_template(template: str) -> str:
+    return template.replace("+#<", "{{").replace("+#>", "}}")
+
+def parse_outgoing_template(template: str) -> str:
+    return template.replace("{{", "+#<").replace("}}", "+#>")

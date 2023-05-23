@@ -7,6 +7,7 @@ from ..dependencies.application import create_application_pipe, update_applicati
 from ..database.models import Application as ApplicationModel, Credentials
 from ..schemas.application import Application, ApplicationCreate, ApplicationUpdate
 from ..utilities.key import generate_api_key
+from ..utilities.jinja import verify_template_directory, verify_template_layout
 
 router = APIRouter()
 
@@ -44,12 +45,12 @@ def update_application(
 ) -> Application:
     body_dict = body.dict(exclude_unset=True)
 
-    if body_dict.get("layout"):
-        body_dict["layout"] = body.layout.replace("+#<", "{{")
-        body_dict["layout"] = body_dict["layout"].replace("+#>", "}}")
-
     for key, value in body_dict.items():
         setattr(application, key, value)
 
     db.commit()
+
+    verify_template_directory()
+    verify_template_layout(application)
+
     return application
