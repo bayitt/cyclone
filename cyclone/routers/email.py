@@ -5,6 +5,7 @@ from ..schemas.email import Email, EmailCreate, EmailUpdate
 from ..dependencies.database import get_db
 from ..dependencies.email import email_by_name_pipe, email_by_uuid_pipe
 from ..database.models import Email as EmailModel
+from ..utilities.jinja import parse_incoming_template
 
 router = APIRouter()
 
@@ -19,7 +20,12 @@ def create_email(
 ) -> Email:
     body_dict = body.dict(exclude_unset=True)
     body_dict["name"] = body.name.upper()
-    email = EmailModel(application_uuid=application_uuid, **body_dict)
+    del body_dict["template"]
+    email = EmailModel(
+        application_uuid=application_uuid,
+        **body_dict,
+        _template=parse_incoming_template(body.template)
+    )
     db.add(email)
     db.commit()
     db.refresh(email)

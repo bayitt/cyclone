@@ -32,7 +32,7 @@ def send(
 
     template = env.get_template(f"{application.name.lower()}.html")
     html = template.render(
-        template=Markup(Template(email.template).render(**body.variables))
+        template=Markup(Template(email._template).render(**body.variables))
     )
 
     dispatch_data = {
