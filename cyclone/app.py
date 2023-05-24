@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, Request, Response
 
 from .utilities.env import load_env
+from .utilities.exception import register_http_exception_handler
 from .middleware.session import add_session_middleware
 from .routers import auth, application, credentials, email, send, dispatch
 from .dependencies.auth import auth_guard
@@ -25,6 +26,7 @@ async def db_session_middleware(request: Request, call_next):
 
 
 add_session_middleware(app)
+register_http_exception_handler(app)
 
 app.include_router(auth.router)
 app.include_router(send.router)

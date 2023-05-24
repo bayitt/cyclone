@@ -1,10 +1,11 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, status
 from sqlalchemy.orm import Session
 from uuid import UUID
 
 from .database import get_db
 from ..schemas.application import ApplicationCreate, ApplicationUpdate
 from ..database.models import Application
+from ..utilities.exception import CycloneHTTPException
 
 
 def create_application_pipe(body: ApplicationCreate, db: Session = Depends(get_db)):
@@ -13,7 +14,8 @@ def create_application_pipe(body: ApplicationCreate, db: Session = Depends(get_d
     )
 
     if application:
-        raise HTTPException(
+        raise CycloneHTTPException(
+            error="application-002",
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Application with name {body.name} exists already",
         )
@@ -27,7 +29,8 @@ def create_application_pipe(body: ApplicationCreate, db: Session = Depends(get_d
                 invalidated_keys.append(key)
 
         if len(invalidated_keys) > 0:
-            raise HTTPException(
+            raise CycloneHTTPException(
+                error="credentials-003",
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"{', '.join(invalidated_keys)} - missing from credentials values",
             )
@@ -39,7 +42,8 @@ def application_by_uuid_pipe(application_uuid: UUID, db: Session = Depends(get_d
     )
 
     if not application:
-        raise HTTPException(
+        raise CycloneHTTPException(
+            error="application-001",
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Application with uuid {application_uuid} does not exist",
         )
@@ -58,7 +62,8 @@ def update_application_pipe(
         )
 
         if named_application and named_application.uuid != application.uuid:
-            raise HTTPException(
+            raise CycloneHTTPException(
+                error="application-002",
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Application with name {body.name} exists already",
             )
