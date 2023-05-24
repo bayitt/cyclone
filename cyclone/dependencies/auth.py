@@ -1,12 +1,16 @@
-from fastapi import Header, HTTPException, status
+from fastapi import Header, status
 from typing import Annotated
 from jose import jwt, JWTError
 from os import environ
 
+from ..utilities.exception import CycloneHTTPException
+
 
 def auth_guard(authorization: Annotated[str | None, Header()] = None):
-    auth_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED, detail="You are not authenticated"
+    auth_exception = CycloneHTTPException(
+        error="auth-001",
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="You are not authenticated",
     )
 
     if not authorization:

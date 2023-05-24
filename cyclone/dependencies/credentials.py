@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, status
 from uuid import UUID
 from sqlalchemy.orm import Session
 from typing import Annotated
@@ -6,6 +6,7 @@ from typing import Annotated
 from .database import get_db
 from ..database.models import Credentials
 from ..schemas.credentials import CredentialsUpdate
+from ..utilities.exception import CycloneHTTPException
 
 
 def credentials_by_uuid_pipe(
@@ -18,7 +19,8 @@ def credentials_by_uuid_pipe(
     )
 
     if not credentials:
-        raise HTTPException(
+        raise CycloneHTTPException(
+            error="credentials-001",
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Credentials with uuid {credentials_uuid} does not exist",
         )
@@ -36,7 +38,8 @@ def credentials_by_uuid_pipe(
                 invalidated_keys.append(key)
 
         if len(invalidated_keys) > 0:
-            raise HTTPException(
+            raise CycloneHTTPException(
+                error="credentials-003",
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"{', '.join(invalidated_keys)} - missing from values",
             )

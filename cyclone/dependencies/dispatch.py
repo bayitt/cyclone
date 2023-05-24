@@ -1,10 +1,11 @@
-from fastapi import Header, Depends, status, HTTPException
+from fastapi import Header, Depends, status
 from sqlalchemy.orm import Session
 from typing import Annotated
 
 from ..database.models import Application, Email
 from ..dependencies.database import get_db
 from ..schemas.dispatch import DispatchCreate
+from ..utilities.exception import CycloneHTTPException
 
 
 def dispatch_guard(
@@ -13,7 +14,8 @@ def dispatch_guard(
     db: Session = Depends(get_db),
 ):
     if not authorization or len(authorization.split(" ")) != 2:
-        HTTPException(
+        CycloneHTTPException(
+            error="auth-002",
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Api key is missing",
         )
@@ -23,7 +25,8 @@ def dispatch_guard(
     application = db.query(Application).filter(Application.api_key == api_key).first()
 
     if not application:
-        raise HTTPException(
+        raise CycloneHTTPException(
+            error="auth-002",
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Application with api key {api_key} does not exist",
         )
@@ -37,7 +40,8 @@ def dispatch_guard(
     )
 
     if not email:
-        raise HTTPException(
+        raise CycloneHTTPException(
+            error="email-001",
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Email with name {body.email.upper()} does not exist",
         )
@@ -53,7 +57,8 @@ def dispatch_guard(
             missing_variables.append(variable)
 
     if len(missing_variables) > 0:
-        raise HTTPException(
+        raise CycloneHTTPException(
+            error="dispatch-003",
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"The following variables are missing - {', '.join(missing_variables)} ",
         )
