@@ -1,4 +1,13 @@
-from sqlalchemy import Column, ForeignKey, String, DateTime, Uuid, Integer, JSON
+from sqlalchemy import (
+    Column,
+    ForeignKey,
+    String,
+    DateTime,
+    Uuid,
+    SmallInteger,
+    JSON,
+    CHAR,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 from datetime import datetime
@@ -15,8 +24,8 @@ class Application(Base):
     uuid: uuid_pkg.UUID = Column(
         Uuid, default=uuid_pkg.uuid4, primary_key=True, index=True
     )
-    name: str = Column(String, index=True)
-    api_key: str | None = Column(String, nullable=True)
+    name: str = Column(String(50), index=True)
+    api_key: str | None = Column(CHAR(32), nullable=True, index=True)
     _layout: str | None = Column(String, nullable=True)
     created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at: datetime = Column(
@@ -53,9 +62,9 @@ class Credentials(Base):
         Uuid, default=uuid_pkg.uuid4, primary_key=True, index=True
     )
     application_uuid: uuid_pkg.UUID = Column(
-        Uuid, ForeignKey("applications.uuid", ondelete="CASCADE")
+        Uuid, ForeignKey("applications.uuid", ondelete="CASCADE"), index=True
     )
-    type: int = Column(Integer)
+    type: int = Column(SmallInteger)
     values: dict[str, str] | None = Column(JSON, nullable=True)
     created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at: datetime = Column(
@@ -74,10 +83,10 @@ class Email(Base):
         Uuid, default=uuid_pkg.uuid4, primary_key=True, index=True
     )
     application_uuid: uuid_pkg.UUID = Column(
-        Uuid, ForeignKey("applications.uuid", ondelete="CASCADE")
+        Uuid, ForeignKey("applications.uuid", ondelete="CASCADE"), index=True
     )
-    name: str = Column(String, index=True)
-    subject: str = Column(String)
+    name: str = Column(String(100), index=True)
+    subject: str = Column(String(100))
     _template: str = Column(String)
     variables: list[str] | None = Column(JSON, nullable=True)
     created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow)
@@ -106,7 +115,7 @@ class Dispatch(Base):
         Uuid, default=uuid_pkg.uuid4, primary_key=True, index=True
     )
     application_uuid: uuid_pkg.UUID = Column(
-        Uuid, ForeignKey("applications.uuid", ondelete="CASCADE")
+        Uuid, ForeignKey("applications.uuid", ondelete="CASCADE"), index=True
     )
     email_uuid: uuid_pkg.UUID = Column(
         Uuid, ForeignKey("emails.uuid", ondelete="CASCADE"), nullable=True
