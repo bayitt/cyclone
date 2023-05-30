@@ -1,4 +1,4 @@
-FROM 3.10-alpine
+FROM 3.10-slim-buster
 
 RUN mkdir -p /app
 
