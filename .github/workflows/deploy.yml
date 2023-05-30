@@ -56,7 +56,7 @@ jobs:
           echo "$SSH_KEY" > ~/.ssh/server_ssh.key
           chmod 600 ~/.ssh/server_ssh.key
           cat >>~/.ssh/config <<END
-          Host ym-docker
+          Host me-docker
             HostName $SSH_HOST
             User $SSH_USER
             IdentityFile ~/.ssh/server_ssh.key
@@ -64,7 +64,7 @@ jobs:
           END
       - name: Deploy Application
         id: deploy
-        run: ssh ym-docker 'cd /home/Olamileke/me-docker && ./deploy.sh ${{ secrets.DOCKERHUB_REPO }}'
+        run: ssh me-docker 'cd /home/Olamileke/me-docker && ./deploy.sh ${{ secrets.DOCKERHUB_REPO }}'
 
       - name: Send out notification if deploy is successful
         if: ${{ steps.deploy.conclusion == 'success' }}
