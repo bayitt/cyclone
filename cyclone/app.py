@@ -9,7 +9,7 @@ from .database.setup import SessionLocal
 
 load_env()
 
-app = FastAPI()
+app = FastAPI(swagger_ui_parameters={"defaultModelsExpandDepth": -1})
 
 
 @app.middleware("http")
