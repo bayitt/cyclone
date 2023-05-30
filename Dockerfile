@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY ./requirements.txt /app/requirements.txt
 
-RUN apt-get update && apt-get install -y python3 python3-pip python-dev build-essential gcc
+RUN apt-get update && apt-get install -y python3 python3-pip libpq-dev python-dev build-essential gcc
 
 RUN pip3 install --no-cache-dir --upgrade -r /app/requirements.txt
 
