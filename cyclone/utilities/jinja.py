@@ -1,14 +1,18 @@
 from pathlib import Path
 from os import path, makedirs
 from jinja2 import Environment, PackageLoader, select_autoescape
-import importlib
 
 
 def verify_template_directory():
     directory = Path(path.join(path.abspath(__file__), "..", "..", "templates"))
+    print(directory)
+    print(directory.is_dir())
 
-    if not directory.is_dir():
+    try:
         makedirs(directory)
+    except Exception as exception:
+        print(str(exception))
+        pass
 
 
 def verify_template_layout(application):
