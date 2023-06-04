@@ -6,15 +6,9 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 def verify_template_directory():
     directory = path.join(path.abspath(__file__), "..", "..", "templates")
     directory = Path(path.abspath(directory))
-    print(directory)
-    print(directory.is_dir())
 
-    try:
+    if not directory.is_dir():
         makedirs(directory)
-    except Exception as exception:
-        print(str(exception))
-        pass
-
 
 def verify_template_layout(application):
     if not application._layout:
@@ -28,7 +22,7 @@ def verify_template_layout(application):
         f"{application.name.lower()}.html",
     )
 
-    layout_file = path.abspath(layout_file)
+    layout_file = Path(path.abspath(layout_file))
 
     if not layout_file.is_file():
         f = open(layout_file, "x")
