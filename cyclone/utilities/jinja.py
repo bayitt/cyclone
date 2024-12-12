@@ -10,6 +10,7 @@ def verify_template_directory():
     if not directory.is_dir():
         makedirs(directory)
 
+
 def verify_template_layout(application):
     if not application._layout:
         return
